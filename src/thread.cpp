@@ -16,6 +16,7 @@ Queue Thread::allThreads;
 Thread::Thread (StackSize stackSize, Time timeSlice){
     lock();
     id=++_ID;
+    cout<<"stsize "<<stackSize<<endl; 
     myPCB=new PCB(this, stackSize, timeSlice);
     allThreads.put(this);
     waitingThreads=new Queue;

@@ -8,25 +8,36 @@ class Trkac:public Thread{
 public:
     Trkac(int m):Thread(), metara(m){}
 protected:
-    virtual void run(){
-        while(metara>0){
-            lock();
-            cout<<"Trkacu broj "<<getId()<<" ostalo je jos "<<--metara<<" metara"<<endl;
-            unlock();
-        }
-    }
+    virtual void run();
 private: 
     int metara;
 };
 
-int userMain(int argc, char* argv[]){
-    Thread* niti[4];
-    int i;
-    for(i=0;i<4;i++){
-        niti[i]=new Trkac(i+50);
-        niti[i]->start();
+void Trkac::run(){
+    while(metara>0){
+        lock();
+        cout<<"Trkacu broj "<<getId()<<" ostalo je jos "<<--metara<<" metara"<<endl;
+        unlock();
+        for(int i=0; i<10000; i++)
+            for(int j=0; j<10000; j++);
     }
-    for(i=0;i<4;i++){
+}
+
+int userMain(int argc, char* argv[]){
+    Thread* niti[2];
+    int i;
+    for(i=0;i<2;i++){
+        niti[i]=new Trkac(i+50);
+        lock();
+        cout<<"stvorio nit "<<niti[i]->getId()<<endl;
+        unlock();
+        niti[i]->start();
+        lock();
+        cout<<"pokrenuo nit "<<niti[i]->getId()<<endl;
+        unlock();
+    }
+    while(1);
+    for(i=0;i<2;i++){
         delete niti[i];
     }
     return 0;

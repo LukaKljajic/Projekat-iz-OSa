@@ -9,7 +9,8 @@
 #include "pcb.h"
 
 #define lock() { Global::lockFlag++;}
-#define unlock() { Global::lockFlag--;}
+#define unlock() { Global::lockFlag--; if(Global::contextSwitchOnDemand) Global::dispatch();}
+
 
 class Global{
 private:
@@ -19,8 +20,8 @@ private:
     friend class IdleThread;
     static void interrupt (*oldTimerInterrupt)(...);
     static void interrupt timerInterrupt(...);
-    static volatile int contextSwitchOnDemand;
 public:
+    static volatile int contextSwitchOnDemand;
     static volatile int lockFlag;
     static void initialize();
     static void finalize();
