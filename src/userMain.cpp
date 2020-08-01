@@ -18,15 +18,15 @@ void Trkac::run(){
         lock();
         cout<<"Trkacu broj "<<getId()<<" ostalo je jos "<<--metara<<" metara"<<endl;
         unlock();
-        for(int i=0; i<10000; i++)
-            for(int j=0; j<10000; j++);
+        for(int i=0; i<5000; i++)
+            for(int j=0; j<5000; j++);
     }
 }
 
 int userMain(int argc, char* argv[]){
-    Thread* niti[2];
+    Thread* niti[15];
     int i;
-    for(i=0;i<2;i++){
+    for(i=0;i<15;i++){
         niti[i]=new Trkac(i+50);
         lock();
         cout<<"stvorio nit "<<niti[i]->getId()<<endl;
@@ -36,7 +36,7 @@ int userMain(int argc, char* argv[]){
         cout<<"pokrenuo nit "<<niti[i]->getId()<<endl;
         unlock();
     }
-    for(i=0;i<2;i++){
+    for(i=0;i<15;i++){
         niti[i]->waitToComplete();
         delete niti[i];
     }

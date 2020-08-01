@@ -39,10 +39,11 @@ void Global::dispatch(){
 }
 
 void interrupt Global::timerInterrupt(...){
-    cout<<"Usao u prekidnu rutinu"<<endl;
-    if(contextSwitchOnDemand) cout<<"Zahtevana promena konteksta"<<endl;
-    if(lockFlag) cout<<"Zabranjeno preuzimanje: "<<lockFlag<<endl;
-    else cout<<"Dozvoljeno preuzimanje"<<endl;
+    asm cli;
+    // cout<<"Usao u prekidnu rutinu"<<endl;
+    // if(contextSwitchOnDemand) cout<<"Zahtevana promena konteksta"<<endl;
+    // if(lockFlag) cout<<"Zabranjeno preuzimanje: "<<lockFlag<<endl;
+    // else cout<<"Dozvoljeno preuzimanje"<<endl;
 
     static volatile unsigned tss, tsp;
     static volatile PCB* newPCB;
@@ -74,7 +75,7 @@ void interrupt Global::timerInterrupt(...){
                         mov sp, tsp
                         mov ss, tss
                     }
-                    cout<<"Izabrana je nit sa ID: "<<Thread::getRunningId()<<endl;
+                    // cout<<"Izabrana je nit sa ID: "<<Thread::getRunningId()<<endl;
                     // cout<<"Vrh steka je SS "<<FP_SEG(Thread::running->myPCB->stack+Thread::running->myPCB->stackSize/2-1)<<", SP "<<FP_OFF(Thread::running->myPCB->stack+Thread::running->myPCB->stackSize/2-1)<<endl;
                     // cout<<"Trenutni SS je "<<tss<<", SP "<<tsp<<endl;
                     break;
@@ -89,6 +90,7 @@ void interrupt Global::timerInterrupt(...){
         //tick(); //otkomentarisati kad se poveze sa testovima
         (*oldTimerInterrupt)();
     }
-    cout<<"Izasao iz prekidne rutine"<<endl;
-    cout<<flush;
+
+    // cout<<"Izasao iz prekidne rutine"<<endl;
+    // cout<<flush;
 }
