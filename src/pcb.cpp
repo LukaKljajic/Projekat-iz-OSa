@@ -49,8 +49,9 @@ void PCB::wrapper(){
         if(!temp) break;
         temp->myPCB->state=READY;
         Scheduler::put(temp->myPCB);
+        cout<<"Izbacio nit "<<temp->getId()<<" iz reda cekanja"<<endl;
     }
-    cout<<"Izbacio elemente iz reda cekanja"<<endl;
+    cout<<Global::lockFlag<<endl;
     unlock();
     dispatch();
 }

@@ -36,8 +36,8 @@ int userMain(int argc, char* argv[]){
         cout<<"pokrenuo nit "<<niti[i]->getId()<<endl;
         unlock();
     }
-    while(1);
     for(i=0;i<2;i++){
+        niti[i]->waitToComplete();
         delete niti[i];
     }
     return 0;

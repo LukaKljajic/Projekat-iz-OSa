@@ -26,10 +26,11 @@ void Global::initialize(){
 void Global::finalize(){
     if(Thread::running!=Thread::mainThread) return;
     lock();
+    cout<<"Usao u finalize"<<endl;
     setvect(0x08, oldTimerInterrupt);
+    unlock();
     delete Thread::mainThread;
     IdleThread::deleteIdle();
-    unlock();
 }
 
 void Global::dispatch(){
@@ -37,15 +38,11 @@ void Global::dispatch(){
     timerInterrupt();
 }
 
-volatile int i, j;
-
 void interrupt Global::timerInterrupt(...){
     cout<<"Usao u prekidnu rutinu"<<endl;
     if(contextSwitchOnDemand) cout<<"Zahtevana promena konteksta"<<endl;
-    if(lockFlag) cout<<"Zabranjeno preuzimanje"<<endl;
+    if(lockFlag) cout<<"Zabranjeno preuzimanje: "<<lockFlag<<endl;
     else cout<<"Dozvoljeno preuzimanje"<<endl;
-
-    for(i=0; i<3000; i++) for(j=0; j<3000; j++);
 
     static volatile unsigned tss, tsp;
     static volatile PCB* newPCB;

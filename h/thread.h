@@ -30,7 +30,7 @@ protected:
     friend class Global;
     friend class IdleThread;
     Thread (StackSize stackSize = defaultStackSize, Time timeSlice = defaultTimeSlice);
-    virtual void run() {}
+    virtual void run();
 private:
     PCB* myPCB;
     static Thread* mainThread;

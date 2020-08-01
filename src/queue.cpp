@@ -43,6 +43,7 @@ void Queue::put(Thread* t){
 Thread* Queue::get(){
     lock();
     if(first==NULL){
+        unlock();
         return NULL;
     }
     Elem* old=first;

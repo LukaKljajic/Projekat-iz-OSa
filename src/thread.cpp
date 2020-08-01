@@ -24,8 +24,8 @@ Thread::Thread (StackSize stackSize, Time timeSlice){
 }
 
 Thread::~Thread(){
-    lock();
     waitToComplete();
+    lock();
     delete waitingThreads;
     delete myPCB;
     unlock();
@@ -45,14 +45,14 @@ Thread* Thread::getThreadById(ID id){
 
 void Thread::waitToComplete(){
     lock();
-    if(myPCB->state==PCB::OVER || myPCB->state==PCB::NEW || this==running || this==mainThread || this==IdleThread::getIdle()){
+    if(myPCB->state!=PCB::OVER && myPCB->state!=PCB::NEW && this!=running && this!=mainThread && this!=IdleThread::getIdle()){
+        running->myPCB->state=PCB::BLOCKED;
+        waitingThreads->put((Thread*)running);
+        cout<<"waittocomplete: "<<Global::lockFlag<<endl;
         unlock();
-        return;
+        dispatch();
     }
-    running->myPCB->state=PCB::BLOCKED;
-    waitingThreads->put((Thread*)running);
-    dispatch();
-    unlock();
+    else unlock();
 }
 
 void Thread::start(){
@@ -69,4 +69,10 @@ void Thread::start(){
 
 void dispatch(){
     Global::dispatch();
+}
+
+void Thread::run(){
+    lock();
+    cout<<"Usao u prazan run Thread klase"<<endl;
+    unlock();
 }
