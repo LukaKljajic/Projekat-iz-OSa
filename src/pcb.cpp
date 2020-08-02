@@ -21,6 +21,8 @@ PCB::PCB(Thread* myT, StackSize stSize, Time tmSlc){
     cout<<"pcbstsize "<<stackSize<<endl;
     timeSlice=tmSlc;
     timeElapsed=0;
+    waitingTime=0;
+    unblockedByTime=0;
     stack=NULL;
     unlock();
 }

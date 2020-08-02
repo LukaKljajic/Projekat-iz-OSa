@@ -29,11 +29,11 @@ protected:
     friend class PCB;
     friend class Global;
     friend class IdleThread;
+    friend class KernelSem;
     Thread (StackSize stackSize = defaultStackSize, Time timeSlice = defaultTimeSlice);
     virtual void run();
 private:
     PCB* myPCB;
-    static Thread* mainThread;
     static volatile Thread* running;
     static Queue allThreads;
     Queue* waitingThreads;
@@ -41,6 +41,6 @@ private:
     ID id;
 };
 
-void dispatch ();
+void dispatch();
 
 #endif

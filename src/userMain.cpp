@@ -24,9 +24,9 @@ void Trkac::run(){
 }
 
 int userMain(int argc, char* argv[]){
-    Thread* niti[15];
+    Thread* niti[10];
     int i;
-    for(i=0;i<15;i++){
+    for(i=0;i<10;i++){
         niti[i]=new Trkac(i+50);
         lock();
         cout<<"stvorio nit "<<niti[i]->getId()<<endl;
@@ -36,7 +36,7 @@ int userMain(int argc, char* argv[]){
         cout<<"pokrenuo nit "<<niti[i]->getId()<<endl;
         unlock();
     }
-    for(i=0;i<15;i++){
+    for(i=0;i<10;i++){
         niti[i]->waitToComplete();
         delete niti[i];
     }

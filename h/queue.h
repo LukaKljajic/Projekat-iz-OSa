@@ -12,12 +12,13 @@ typedef int ID;
 
 class Queue{
 private:
+    friend class Global;
     struct Elem{
         Thread* info;
         Elem* next;
         Elem(Thread* i, Elem* n=NULL):info(i), next(n){}
     };
-    Elem* first, *last;
+    Elem* first, *last, *current, *prev;
     int size;
 public:
     Queue();

@@ -1,13 +1,15 @@
-#include "queue.h"
+#include "ksemlist.h"
 
-Queue::Queue(){
+class KSemList;
+
+KSemList::KSemList(){
     lock();
-    prev=current=last=first=NULL;
+    current=last=first=NULL;
     size=0;
     unlock();
 }
 
-Queue::~Queue(){
+KSemList::~KSemList(){
     lock();
     Elem* temp=first, *old;
     while(temp){
@@ -19,7 +21,7 @@ Queue::~Queue(){
     unlock();
 }
 
-void Queue::put(Thread* t){
+void KSemList::put(KernelSem* t){
     lock();
     Elem* current;
     for(current=first; current != NULL; current=current->next){
@@ -40,14 +42,14 @@ void Queue::put(Thread* t){
     unlock();
 }
 
-Thread* Queue::get(){
+KernelSem* KSemList::get(){
     lock();
     if(first==NULL){
         unlock();
         return NULL;
     }
     Elem* old=first;
-    Thread* res=old->info;
+    KernelSem* res=old->info;
     first=first->next;
     if (first==NULL) last=NULL;
     delete old;
@@ -56,12 +58,6 @@ Thread* Queue::get(){
     return res;
 }
 
-int Queue::getSize(){
+int KSemList::getSize(){
     return size;
-}
-
-Thread* Queue::findByID(ID id){
-    Elem* temp=first;
-    for(; temp && temp->info->getId()!=id; temp=temp->next);
-    return temp->info;
 }

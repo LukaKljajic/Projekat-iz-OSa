@@ -3,13 +3,13 @@
 #include "schedule.h"
 #include "global.h"
 #include "idle.h"
+#include "mainthr.h"
 #include <dos.h>
 #include <stdlib.h>
 
 class Global;
 
 int Thread::_ID=0;
-Thread* Thread::mainThread=NULL;
 volatile Thread* Thread::running=NULL;
 Queue Thread::allThreads;
 
@@ -45,7 +45,7 @@ Thread* Thread::getThreadById(ID id){
 
 void Thread::waitToComplete(){
     lock();
-    if(myPCB->state!=PCB::OVER && myPCB->state!=PCB::NEW && this!=running && this!=mainThread && this!=IdleThread::getIdle()){
+    if(myPCB->state!=PCB::OVER && myPCB->state!=PCB::NEW && this!=running && this!=MainThread::getMain() && this!=IdleThread::getIdle()){
         running->myPCB->state=PCB::BLOCKED;
         waitingThreads->put((Thread*)running);
         cout<<"waittocomplete: "<<Global::lockFlag<<endl;

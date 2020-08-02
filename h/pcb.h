@@ -13,12 +13,15 @@ private:
     friend class Thread;
     friend class Global;
     friend class IdleThread;
+    friend class KernelSem;
     Thread* myThread;
     static const int NEW, READY, BLOCKED, OVER;
     volatile int state;
     StackSize stackSize;
     Time timeSlice; //obratiti paznju kasnije
     volatile Time timeElapsed;
+    volatile Time waitingTime;
+    volatile int unblockedByTime;
     unsigned* stack;
     unsigned sp, ss;
     void initStack();

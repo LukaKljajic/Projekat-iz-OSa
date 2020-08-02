@@ -2,6 +2,9 @@
 #include "thread.h"
 #include "idle.h"
 #include "schedule.h"
+#include "mainthr.h"
+#include "kernelse.h"
+#include "ksemlist.h"
 #include <dos.h>
 #include <stdlib.h>
 #include <iostream.h>
@@ -13,23 +16,24 @@ void interrupt (*Global::oldTimerInterrupt)(...)=NULL;
 void Global::initialize(){
     lock();
     cout<<"Poceo sam inicijalizaciju"<<endl;
-    Thread::running=Thread::mainThread=new Thread(0x5000, 1);
-    Thread::mainThread->myPCB->state=PCB::READY;
+    Thread::running=MainThread::getMain();
+    Thread::running->myPCB->state=PCB::READY;
     oldTimerInterrupt=getvect(0x08);
     setvect(0x08, timerInterrupt);
-    IdleThread* idle=IdleThread::getIdle();
+    Thread* idle=IdleThread::getIdle();
     idle->start();
     cout<<"inicijalizovao sam"<<endl;
     unlock();
 }
 
 void Global::finalize(){
-    if(Thread::running!=Thread::mainThread) return;
+    if(Thread::running!=MainThread::getMain()) return;
     lock();
     cout<<"Usao u finalize"<<endl;
     setvect(0x08, oldTimerInterrupt);
+    Thread::running=NULL;
     unlock();
-    delete Thread::mainThread;
+    MainThread::deleteMain();
     IdleThread::deleteIdle();
 }
 
@@ -89,6 +93,38 @@ void interrupt Global::timerInterrupt(...){
     if(!contextSwitchOnDemand){
         //tick(); //otkomentarisati kad se poveze sa testovima
         (*oldTimerInterrupt)();
+        KSemList semaphores=KernelSem::semaphores;
+        for(semaphores.current=semaphores.first; semaphores.current; semaphores.current=semaphores.current->next){
+            KernelSem* semaphore=semaphores.current->info;
+            Queue* threads=semaphore->waitingThreads;
+            threads->prev=NULL;
+            threads->current=threads->first;
+            while(threads->current){
+                Thread* thread=threads->current->info;
+                if(thread->myPCB->waitingTime>0 && --thread->myPCB->waitingTime==0){
+                    Queue::Elem* old;
+                    if(threads->prev){
+                        threads->prev->next=threads->current->next;
+                        old=threads->current;
+                        threads->current=threads->current->next;
+                    }
+                    else{
+                        old=threads->current;
+                        threads->first=threads->current=threads->current->next;
+                        if(!threads->first) threads->last=NULL;
+                    }
+                    semaphore->value++;
+                    thread->myPCB->state=PCB::READY;
+                    Scheduler::put(thread->myPCB);
+                    thread->myPCB->unblockedByTime=1;
+                    delete old;
+                }
+                else{
+                    threads->prev=threads->current;
+                    threads->current=threads->current->next;
+                }
+            }
+        }
     }
 
     // cout<<"Izasao iz prekidne rutine"<<endl;

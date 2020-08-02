@@ -8,10 +8,10 @@ class Thread;
 
 class IdleThread:public Thread{
     IdleThread();
-    static IdleThread* idle;
+    static volatile Thread* idle;
 public:
     void start();
-    static IdleThread* getIdle();
+    static Thread* getIdle();
     static void deleteIdle();
 protected:
     virtual void run();

@@ -3,7 +3,7 @@
 #include "global.h"
 #include "pcb.h"
 
-IdleThread* IdleThread::idle=NULL;
+volatile Thread* IdleThread::idle=NULL;
 
 IdleThread::IdleThread():Thread(100, 1){}
 
@@ -22,12 +22,12 @@ void IdleThread::run(){
     while(1);
 }
 
-IdleThread* IdleThread::getIdle(){
+Thread* IdleThread::getIdle(){
     if(!idle) idle=new IdleThread;
-    return idle;
+    return (Thread*)idle;
 }
 
 void IdleThread::deleteIdle(){
     delete idle;
-    idle=NULL;
+    //idle=NULL;
 }
