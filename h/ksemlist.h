@@ -8,7 +8,7 @@ class KernelSem;
 
 class KSemList{
 private:
-    friend class Global;
+    friend class KernelSem;
     struct Elem{
         KernelSem* info;
         Elem* next;
@@ -16,12 +16,14 @@ private:
     };
     Elem* first, *last, *current;
     int size;
-public:
+    static KSemList semaphores;
     KSemList();
-    virtual ~KSemList();
     void put(KernelSem* t);
     KernelSem* get();
     int getSize();
+public:
+    virtual ~KSemList();
+    static void deblockByTime();
 };
 
 #endif

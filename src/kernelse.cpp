@@ -1,11 +1,10 @@
 #include "kernelse.h"
+#include "global.h"
 #include "thread.h"
 #include "schedule.h"
 
-KSemList KernelSem::semaphores;
-
 KernelSem::KernelSem(int init):value(init){
-    semaphores.put(this);
+    KSemList::semaphores.put(this);
     waitingThreads=new Queue; 
 }
 
@@ -18,7 +17,10 @@ int KernelSem::wait(Time maxTimeToWait){
         Thread::running->myPCB->state=PCB::BLOCKED;
         Thread::running->myPCB->waitingTime=maxTimeToWait;
         waitingThreads->put((Thread*)Thread::running);
+        printDebug("Blokirao nit "<<Thread::getRunningId());
+        unlock();
         dispatch();
+        lock();
     }
     if(Thread::running->myPCB->unblockedByTime){
         Thread::running->myPCB->unblockedByTime=0;
@@ -28,13 +30,16 @@ int KernelSem::wait(Time maxTimeToWait){
 }
 
 int KernelSem::signal(int n){
-    if(n<0) return n;
+    if(n<0){
+        return n;
+    } 
     if(n==0){
         if(++value<=0){
             Thread* t=waitingThreads->get();
             t->myPCB->state=PCB::READY;
             t->myPCB->unblockedByTime=0;
             Scheduler::put(t->myPCB);
+            printDebug("Odblokirao nit "<<t->getId()<<" signalom");
         }
         return 0;
     }
@@ -44,6 +49,7 @@ int KernelSem::signal(int n){
         t->myPCB->state=PCB::READY;
         t->myPCB->unblockedByTime=0;
         Scheduler::put(t->myPCB);
+        printDebug("Odblokirao nit "<<t->getId()<<" signalom");
         ret++;
     }
     value+=n;

@@ -12,7 +12,7 @@ typedef int ID;
 
 class Queue{
 private:
-    friend class Global;
+    friend class KSemList;
     struct Elem{
         Thread* info;
         Elem* next;

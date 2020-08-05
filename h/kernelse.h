@@ -7,7 +7,7 @@
 #include "ksemlist.h"
 
 class Semaphore;
-class KSemList;
+class Queue;
 
 class KernelSem{
 public:
@@ -17,8 +17,7 @@ public:
     virtual int signal(int n=0);
     int val () const;
 private:
-    friend class Global;
-    static KSemList semaphores;
+    friend class KSemList;
     Queue* waitingThreads;
     int value;
 };

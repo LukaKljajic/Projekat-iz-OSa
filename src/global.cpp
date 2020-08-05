@@ -15,21 +15,19 @@ void interrupt (*Global::oldTimerInterrupt)(...)=NULL;
 
 void Global::initialize(){
     lock();
-    cout<<"Poceo sam inicijalizaciju"<<endl;
     Thread::running=MainThread::getMain();
     Thread::running->myPCB->state=PCB::READY;
     oldTimerInterrupt=getvect(0x08);
     setvect(0x08, timerInterrupt);
     Thread* idle=IdleThread::getIdle();
     idle->start();
-    cout<<"inicijalizovao sam"<<endl;
     unlock();
 }
 
 void Global::finalize(){
     if(Thread::running!=MainThread::getMain()) return;
     lock();
-    cout<<"Usao u finalize"<<endl;
+    printDebug("Usao u finalize");
     setvect(0x08, oldTimerInterrupt);
     Thread::running=NULL;
     unlock();
@@ -54,7 +52,9 @@ void interrupt Global::timerInterrupt(...){
 
     if(!contextSwitchOnDemand && Thread::running->myPCB->timeSlice!=0){
         Thread::running->myPCB->timeElapsed++;
+        // cout<<"Proslo je "<<Thread::running->myPCB->timeElapsed<<" vremena"<<endl;
     }
+    // else cout<<"Ova nit nema zadato vreme"<<endl;
 
     if((contextSwitchOnDemand || (Thread::running->myPCB->timeElapsed==Thread::running->myPCB->timeSlice && Thread::running->myPCB->timeSlice!=0))){
         if(lockFlag==0){
@@ -80,8 +80,7 @@ void interrupt Global::timerInterrupt(...){
                         mov ss, tss
                     }
                     // cout<<"Izabrana je nit sa ID: "<<Thread::getRunningId()<<endl;
-                    // cout<<"Vrh steka je SS "<<FP_SEG(Thread::running->myPCB->stack+Thread::running->myPCB->stackSize/2-1)<<", SP "<<FP_OFF(Thread::running->myPCB->stack+Thread::running->myPCB->stackSize/2-1)<<endl;
-                    // cout<<"Trenutni SS je "<<tss<<", SP "<<tsp<<endl;
+                    if(Thread::running==IdleThread::getIdle()) cout<<"izabrana je idle nit"<<endl;
                     break;
                 }
             }
@@ -93,40 +92,8 @@ void interrupt Global::timerInterrupt(...){
     if(!contextSwitchOnDemand){
         //tick(); //otkomentarisati kad se poveze sa testovima
         (*oldTimerInterrupt)();
-        KSemList semaphores=KernelSem::semaphores;
-        for(semaphores.current=semaphores.first; semaphores.current; semaphores.current=semaphores.current->next){
-            KernelSem* semaphore=semaphores.current->info;
-            Queue* threads=semaphore->waitingThreads;
-            threads->prev=NULL;
-            threads->current=threads->first;
-            while(threads->current){
-                Thread* thread=threads->current->info;
-                if(thread->myPCB->waitingTime>0 && --thread->myPCB->waitingTime==0){
-                    Queue::Elem* old;
-                    if(threads->prev){
-                        threads->prev->next=threads->current->next;
-                        old=threads->current;
-                        threads->current=threads->current->next;
-                    }
-                    else{
-                        old=threads->current;
-                        threads->first=threads->current=threads->current->next;
-                        if(!threads->first) threads->last=NULL;
-                    }
-                    semaphore->value++;
-                    thread->myPCB->state=PCB::READY;
-                    Scheduler::put(thread->myPCB);
-                    thread->myPCB->unblockedByTime=1;
-                    delete old;
-                }
-                else{
-                    threads->prev=threads->current;
-                    threads->current=threads->current->next;
-                }
-            }
-        }
+        KSemList::deblockByTime();
     }
 
     // cout<<"Izasao iz prekidne rutine"<<endl;
-    // cout<<flush;
 }

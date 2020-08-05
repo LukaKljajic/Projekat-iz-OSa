@@ -14,6 +14,7 @@ private:
     friend class Global;
     friend class IdleThread;
     friend class KernelSem;
+    friend class KSemList;
     Thread* myThread;
     static const int NEW, READY, BLOCKED, OVER;
     volatile int state;

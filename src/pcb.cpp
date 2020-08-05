@@ -18,7 +18,6 @@ PCB::PCB(Thread* myT, StackSize stSize, Time tmSlc){
     state=NEW;
     if(stSize>65536) stackSize=65536;
     else stackSize=stSize;
-    cout<<"pcbstsize "<<stackSize<<endl;
     timeSlice=tmSlc;
     timeElapsed=0;
     waitingTime=0;
@@ -35,15 +34,14 @@ PCB::~PCB(){
 
 void PCB::wrapper(){
     lock();
-    cout<<"usao u nit sa ID: "<<Thread::running->getId()<<endl;
-    if(Thread::running==IdleThread::getIdle()) cout<<"Ovo je idle nit"<<endl;
+    printDebug("usao u nit sa ID: "<<Thread::running->getId());
+    if(Thread::running==IdleThread::getIdle()) printDebug("Ovo je idle nit");
     unlock();
 
     Thread::running->run();
 
     lock();
-    cout<<flush;
-    cout<<"Zavrsio nit"<<endl;
+    printDebug("Zavrsio nit");
     Thread::running->myPCB->state=OVER;
     Thread* temp;
     while(1){
@@ -51,17 +49,14 @@ void PCB::wrapper(){
         if(!temp) break;
         temp->myPCB->state=READY;
         Scheduler::put(temp->myPCB);
-        cout<<"Izbacio nit "<<temp->getId()<<" iz reda cekanja"<<endl;
+        printDebug("Izbacio nit "<<temp->getId()<<" iz reda cekanja");
     }
-    cout<<Global::lockFlag<<endl;
     unlock();
     dispatch();
 }
 
 void PCB::initStack(){
     lock();
-    cout<<"velicina steka je "<<stackSize<<endl;
-    if(myThread==IdleThread::getIdle()) cout<<"ovo je idle nit"<<endl;
     static int n=stackSize/2;
     stack=new unsigned[n];
 
@@ -71,9 +66,6 @@ void PCB::initStack(){
 
     ss=FP_SEG(stack+n-12);
     sp=FP_OFF(stack+n-12);
-    cout<<FP_SEG(stack+n-1)<<" "<<FP_OFF(stack+n-1)<<endl;
-    cout<<"ss="<<ss<<", sp="<<sp<<endl;
-    cout<<"stvorio stek niti sa ID: "<<myThread->getId()<<endl;
     unlock();
 }
 
