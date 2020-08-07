@@ -76,7 +76,7 @@ void KSemList::deblockByTime(){
         while(threads->current){
             Thread* thread=threads->current->info;
             if(thread->myPCB->waitingTime>0 && --thread->myPCB->waitingTime==0){
-                printDebug("Odblokirace nit "<<thread->getId()<<" prekidom");
+                // printDebug("Odblokirace nit "<<thread->getId()<<" prekidom");
                 Queue::Elem* old;
                 if(threads->prev){
                     threads->prev->next=threads->current->next;

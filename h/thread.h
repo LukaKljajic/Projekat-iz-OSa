@@ -5,6 +5,7 @@
 #include "pcb.h"
 #include "queue.h"
 #include "ksemlist.h"
+#include "event.h"
 
 typedef unsigned long StackSize;
 const StackSize defaultStackSize = 4096;
@@ -32,6 +33,7 @@ protected:
     friend class IdleThread;
     friend class KernelSem;
     friend class KSemList;
+    friend class Event;
     Thread (StackSize stackSize = defaultStackSize, Time timeSlice = defaultTimeSlice);
     virtual void run();
 private:

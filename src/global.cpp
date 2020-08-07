@@ -80,7 +80,7 @@ void interrupt Global::timerInterrupt(...){
                         mov ss, tss
                     }
                     // cout<<"Izabrana je nit sa ID: "<<Thread::getRunningId()<<endl;
-                    if(Thread::running==IdleThread::getIdle()) cout<<"izabrana je idle nit"<<endl;
+                    // if(Thread::running==IdleThread::getIdle()) cout<<"izabrana je idle nit"<<endl;
                     break;
                 }
             }

@@ -34,14 +34,14 @@ PCB::~PCB(){
 
 void PCB::wrapper(){
     lock();
-    printDebug("usao u nit sa ID: "<<Thread::running->getId());
-    if(Thread::running==IdleThread::getIdle()) printDebug("Ovo je idle nit");
+    // printDebug("usao u nit sa ID: "<<Thread::running->getId());
+    // if(Thread::running==IdleThread::getIdle()) printDebug("Ovo je idle nit");
     unlock();
 
     Thread::running->run();
 
     lock();
-    printDebug("Zavrsio nit");
+    // printDebug("Zavrsio nit");
     Thread::running->myPCB->state=OVER;
     Thread* temp;
     while(1){
@@ -49,7 +49,7 @@ void PCB::wrapper(){
         if(!temp) break;
         temp->myPCB->state=READY;
         Scheduler::put(temp->myPCB);
-        printDebug("Izbacio nit "<<temp->getId()<<" iz reda cekanja");
+        // printDebug("Izbacio nit "<<temp->getId()<<" iz reda cekanja");
     }
     unlock();
     dispatch();

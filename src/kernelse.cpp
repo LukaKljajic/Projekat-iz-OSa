@@ -17,7 +17,7 @@ int KernelSem::wait(Time maxTimeToWait){
         Thread::running->myPCB->state=PCB::BLOCKED;
         Thread::running->myPCB->waitingTime=maxTimeToWait;
         waitingThreads->put((Thread*)Thread::running);
-        printDebug("Blokirao nit "<<Thread::getRunningId());
+        // printDebug("Blokirao nit "<<Thread::getRunningId());
         unlock();
         dispatch();
         lock();
@@ -39,7 +39,7 @@ int KernelSem::signal(int n){
             t->myPCB->state=PCB::READY;
             t->myPCB->unblockedByTime=0;
             Scheduler::put(t->myPCB);
-            printDebug("Odblokirao nit "<<t->getId()<<" signalom");
+            // printDebug("Odblokirao nit "<<t->getId()<<" signalom");
         }
         return 0;
     }
@@ -49,7 +49,7 @@ int KernelSem::signal(int n){
         t->myPCB->state=PCB::READY;
         t->myPCB->unblockedByTime=0;
         Scheduler::put(t->myPCB);
-        printDebug("Odblokirao nit "<<t->getId()<<" signalom");
+        // printDebug("Odblokirao nit "<<t->getId()<<" signalom");
         ret++;
     }
     value+=n;

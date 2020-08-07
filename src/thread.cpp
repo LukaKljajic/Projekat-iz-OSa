@@ -47,7 +47,7 @@ void Thread::waitToComplete(){
     if(myPCB->state!=PCB::OVER && myPCB->state!=PCB::NEW && this!=running && this!=MainThread::getMain() && this!=IdleThread::getIdle()){
         running->myPCB->state=PCB::BLOCKED;
         waitingThreads->put((Thread*)running);
-        printDebug("waittocomplete: pozvan za "<<getId()<<" pozivalac "<<getRunningId()<<" lockflag "<<Global::lockFlag);
+        // printDebug("waittocomplete: pozvan za "<<getId()<<" pozivalac "<<getRunningId()<<" lockflag "<<Global::lockFlag);
         unlock();
         dispatch();
     }
