@@ -90,7 +90,7 @@ void interrupt Global::timerInterrupt(...){
     }
 
     if(!contextSwitchOnDemand){
-        //tick(); //otkomentarisati kad se poveze sa testovima
+        tick(); //otkomentarisati kad se poveze sa testovima
         (*oldTimerInterrupt)();
         KSemList::deblockByTime();
     }

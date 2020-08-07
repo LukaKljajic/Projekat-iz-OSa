@@ -23,7 +23,7 @@ void IVTEntry::callOldRoutine(){
 }
 
 void IVTEntry::signal(){
-    kEvent->signal();
+    if(kEvent) kEvent->signal();
 }
 
 void IVTEntry::setKEvent(KernelEv* kEv){

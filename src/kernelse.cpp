@@ -17,7 +17,7 @@ int KernelSem::wait(Time maxTimeToWait){
         Thread::running->myPCB->state=PCB::BLOCKED;
         Thread::running->myPCB->waitingTime=maxTimeToWait;
         waitingThreads->put((Thread*)Thread::running);
-        // printDebug("Blokirao nit "<<Thread::getRunningId());
+        // printDebug("Blokirao nit "<<Thread:: getRunningId());
         unlock();
         dispatch();
         lock();

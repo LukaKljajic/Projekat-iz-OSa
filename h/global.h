@@ -10,9 +10,9 @@
 
 #define lock() { Global::lockFlag++;}
 #define unlock() { Global::lockFlag--; if(Global::contextSwitchOnDemand) Global::dispatch();}
-#define intLock() {asm{pushf; cli;}}
-#define intUnlock() {asm{popf}}
-#define printDebug(X) {intLock(); cout<<X<<endl; intUnlock();}
+#define MyintLock() {asm{pushf; cli;}}
+#define MyintUnlock() {asm{popf}}
+#define printDebug(X) {MyintLock(); cout<<X<<endl; MyintUnlock();}
 
 
 class Global{
@@ -31,6 +31,6 @@ public:
     static void dispatch();
 };
 
-extern int tick();
+extern void tick();
 
 #endif
