@@ -12,6 +12,7 @@ class KernelEv;
     void interrupt intr##No(...);\
     IVTEntry ivte##No(No, intr##No);\
     void interrupt intr##No(...){\
+        asm cli;\
         if(flag) ivte##No.callOldRoutine();\
         ivte##No.signal();\
     }

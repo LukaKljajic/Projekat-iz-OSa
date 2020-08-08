@@ -15,7 +15,7 @@ Queue Thread::allThreads;
 
 Thread::Thread (StackSize stackSize, Time timeSlice){
     lock();
-    id=++_ID;
+    id=_ID++;
     myPCB=new PCB(this, stackSize, timeSlice);
     allThreads.put(this);
     waitingThreads=new Queue;
@@ -43,23 +43,24 @@ Thread* Thread::getThreadById(ID id){
 }
 
 void Thread::waitToComplete(){
-    lock();
+    //lock();
     if(myPCB->state!=PCB::OVER && myPCB->state!=PCB::NEW && this!=running && this!=MainThread::getMain() && this!=IdleThread::getIdle()){
+        lock();
         running->myPCB->state=PCB::BLOCKED;
         waitingThreads->put((Thread*)running);
         // printDebug("waittocomplete: pozvan za "<<getId()<<" pozivalac "<<getRunningId()<<" lockflag "<<Global::lockFlag);
         unlock();
         dispatch();
     }
-    else unlock();
+    //else unlock();
 }
 
 void Thread::start(){
-    lock();
     if(myPCB->state!=PCB::NEW){
-        unlock();
+        // unlock();
         return;
     }
+    lock();
     myPCB->initStack();
     myPCB->state=PCB::READY;
     Scheduler::put(myPCB);

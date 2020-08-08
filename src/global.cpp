@@ -24,10 +24,18 @@ void Global::initialize(){
     unlock();
 }
 
+volatile int i=0;
+volatile int first=1;
+volatile unsigned long* ran = NULL;
+volatile int numOfThreads = 0;
+
 void Global::finalize(){
     if(Thread::running!=MainThread::getMain()) return;
     lock();
-    printDebug("Usao u finalize");
+    for(i=0; i<numOfThreads; i++) {
+        printDebug("Nit "<<i<<" je bila uposljena "<<ran[i]<<" puta");
+    }
+    // printDebug("Usao u finalize");
     setvect(0x08, oldTimerInterrupt);
     Thread::running=NULL;
     unlock();
@@ -49,12 +57,24 @@ void interrupt Global::timerInterrupt(...){
 
     static volatile unsigned tss, tsp;
     static volatile PCB* newPCB;
+    if(first){
+        numOfThreads = Thread::allThreads.getSize();
+        ran = new unsigned long[numOfThreads];
+        for(i=0; i<numOfThreads; i++) ran[i]=0;
+        first=0;
+    }
 
     if(!contextSwitchOnDemand && Thread::running->myPCB->timeSlice!=0){
         Thread::running->myPCB->timeElapsed++;
         // cout<<"Proslo je "<<Thread::running->myPCB->timeElapsed<<" vremena"<<endl;
     }
     // else cout<<"Ova nit nema zadato vreme"<<endl;
+    
+    if(!contextSwitchOnDemand){
+        tick(); //otkomentarisati kad se poveze sa testovima
+        (*oldTimerInterrupt)();
+        KSemList::deblockByTime();
+    }
 
     if((contextSwitchOnDemand || (Thread::running->myPCB->timeElapsed==Thread::running->myPCB->timeSlice && Thread::running->myPCB->timeSlice!=0))){
         if(lockFlag==0){
@@ -81,6 +101,7 @@ void interrupt Global::timerInterrupt(...){
                     }
                     // cout<<"Izabrana je nit sa ID: "<<Thread::getRunningId()<<endl;
                     // if(Thread::running==IdleThread::getIdle()) cout<<"izabrana je idle nit"<<endl;
+                    ran[Thread::getRunningId()]++;
                     break;
                 }
             }
@@ -89,11 +110,6 @@ void interrupt Global::timerInterrupt(...){
         Thread::running->myPCB->timeElapsed=0;
     }
 
-    if(!contextSwitchOnDemand){
-        tick(); //otkomentarisati kad se poveze sa testovima
-        (*oldTimerInterrupt)();
-        KSemList::deblockByTime();
-    }
 
     // cout<<"Izasao iz prekidne rutine"<<endl;
 }

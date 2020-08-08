@@ -13,7 +13,7 @@ const int PCB::BLOCKED=2;
 const int PCB::OVER=3;
 
 PCB::PCB(Thread* myT, StackSize stSize, Time tmSlc){
-    lock();
+    // lock();
     myThread=myT;
     state=NEW;
     if(stSize>65536) stackSize=65536;
@@ -23,24 +23,25 @@ PCB::PCB(Thread* myT, StackSize stSize, Time tmSlc){
     waitingTime=0;
     unblockedByTime=0;
     stack=NULL;
-    unlock();
+    // unlock();
 }
 
 PCB::~PCB(){
-    lock();
+    // lock();
     delete stack;
-    unlock();
+    // unlock();
 }
 
 void PCB::wrapper(){
-    lock();
+    // lock();
     // printDebug("usao u nit sa ID: "<<Thread::running->getId());
     // if(Thread::running==IdleThread::getIdle()) printDebug("Ovo je idle nit");
-    unlock();
+    // unlock();
 
     Thread::running->run();
 
     lock();
+    // cout<<flush;
     // printDebug("Zavrsio nit");
     Thread::running->myPCB->state=OVER;
     Thread* temp;
@@ -56,7 +57,7 @@ void PCB::wrapper(){
 }
 
 void PCB::initStack(){
-    lock();
+    // lock();
     static int n=stackSize/2;
     stack=new unsigned[n];
 
@@ -66,7 +67,7 @@ void PCB::initStack(){
 
     ss=FP_SEG(stack+n-12);
     sp=FP_OFF(stack+n-12);
-    unlock();
+    // unlock();
 }
 
 // volatile unsigned newss, newsp, newcs, newip, oldss, oldsp;

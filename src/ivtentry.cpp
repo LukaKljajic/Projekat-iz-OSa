@@ -23,11 +23,15 @@ void IVTEntry::callOldRoutine(){
 }
 
 void IVTEntry::signal(){
+    lock();
     if(kEvent) kEvent->signal();
+    unlock();
 }
 
 void IVTEntry::setKEvent(KernelEv* kEv){
+    //lock();
     kEvent=kEv;
+    //unlock();
 }
 
 IVTEntry* IVTEntry::getEntry(IVTNo ivtNo){

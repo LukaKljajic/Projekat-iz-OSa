@@ -9,7 +9,7 @@
 #include "pcb.h"
 
 #define lock() { Global::lockFlag++;}
-#define unlock() { Global::lockFlag--; if(Global::contextSwitchOnDemand) Global::dispatch();}
+#define unlock() { Global::lockFlag--; if(Global::lockFlag==0 && Global::contextSwitchOnDemand) Global::dispatch();}
 #define MyintLock() {asm{pushf; cli;}}
 #define MyintUnlock() {asm{popf}}
 #define printDebug(X) {MyintLock(); cout<<X<<endl; MyintUnlock();}
